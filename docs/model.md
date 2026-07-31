@@ -92,6 +92,41 @@ P_R times P_(Z_1) times ... times P_(Z_d).
 
 This common reference is independent of the challenge secret.
 
+## Consequences for arbitrary secret priors
+
+Let `T = (R, Z_1, ..., Z_d)` and give `S` any prior distribution independent of
+the sharing randomness. The common-reference identity implies
+
+```text
+I(S;T) <= log(1 + prod_i e_i/(Q-1)^(d-1))
+```
+
+with natural logarithms. This follows from the relative-entropy barycenter identity
+and `D(P || M) <= log(1 + chi2(P || M))`. It is an average one-shot information
+bound. It is not a simulator, a sequential-composition theorem, or permission to
+take another leakage snapshot after capsule disclosure.
+
+## Standard-game embedding
+
+Regard `R` as one additional, oversized share. Then `(R, X_1, ..., X_d)` is a
+perfect `(d+1)`-out-of-`(d+1)` sharing:
+
+- if `R` is known but some `X_j` is missing, the view reduces by local inversion
+  to at most `d-1` additive shares;
+- if `R` is missing, the whole `X` tuple is independent uniform because `B`
+  independently masks `X_1` and `(U_2, ..., U_d)` is uniform for fixed `s`.
+
+In the standard nonadaptive local-leakage game, designate the capsule component as
+the fully revealed unauthorized set and require the leakage functions on the other
+components to be fixed independently of that revealed share. The resulting view is
+identically distributed to the transcript above. Thus the chronology is an operational
+interpretation of an established game slice, not a claim to a new security definition.
+
+This does not establish a full leakage-resilient secret-sharing scheme: the theorem
+covers only the designated unauthorized set containing `R`, whereas the standard
+definition quantifies over every unauthorized set. The capsule also has larger size than
+each encoded-share component.
+
 ## Operational interpretation
 
 The narrow motivating case is a one-time forensic, cold-boot, or memory-snapshot

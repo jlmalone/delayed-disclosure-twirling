@@ -5,10 +5,14 @@ local share encodings are randomized by hidden metadata, leakage is obtained onc
 recovery metadata is disclosed only after that leakage snapshot.
 
 The central candidate result is an exact fixed-secret chi-square identity for arbitrary
-conditionally independent local stochastic leakage channels. The project also studies a
-finite-abelian-group orbit decomposition, minimax optimality of uniform field multipliers,
-and the impossibility of obtaining the same protection when leakage functions can depend on
-the randomizer.
+conditionally independent local stochastic leakage channels, with pairwise statistical
+and arbitrary-prior mutual-information consequences. The project also studies a
+finite-abelian-group orbit decomposition, projective minimax distributions for field
+multipliers, an exact real-dual-orbit minimax classification for arbitrary finite abelian
+groups in a character-order-dependent range, a full-energy result for single-real-orbit
+actions, a strict-interior uniqueness and seed-entropy theorem for field multipliers,
+and the impossibility of obtaining the same protection when leakage functions can depend
+on the randomizer.
 
 ## Status
 
@@ -39,6 +43,15 @@ only after leakage, then for every fixed secret the transcript has exact chi-squ
 \]
 
 from the product of its public-metadata and local-leakage marginals.
+
+For any distribution of the secret, the same identity implies that the mutual information
+between the secret and the complete transcript is at most
+
+\[
+\log\left(1+\frac{\prod_{i=1}^d e_i}{(Q-1)^{d-1}}\right)
+\]
+
+in nats. This is an average information-leakage guarantee, not a composability claim.
 
 The delayed-disclosure condition is essential. A leakage function that knows a local bijection
 can invert it before applying any attack on the original share.

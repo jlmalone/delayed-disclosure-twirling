@@ -24,7 +24,7 @@
 
 \title{Delayed-Disclosure Twirling for Additive Secret Sharing:\\
 Exact Leakage Identities and Minimax Local Randomization}
-\author{Anonymous research draft}
+\author{}
 \date{}
 
 \begin{document}
@@ -43,12 +43,22 @@ $\chitwo$ divergence
 \]
 from the product of its recovery-metadata and local-leakage marginals, where
 $e_i$ is the $\chitwo$ information of the $i$th channel under a uniform input.
+The identity implies pairwise statistical secrecy and an arbitrary-prior mutual-
+information bound.
 We extend the identity to finite abelian groups, where the answer decomposes over
-orbits of the automorphism action on the dual group.  Over $\F_{2^n}$ and for
-local $\chitwo$ budgets at most one, concentrated one-character channels give a
-matching minimax lower bound.  Consequently, uniform relative multipliers are
-minimax within this local-automorphism compiler class and require
-$(d-1)\log_2(Q-1)$ bits of multiplier-seed min-entropy.  Finally, we show that
+orbits of the automorphism action on the dual group.  Because real channels have
+equal energy at conjugate characters, these terms combine into inversion-closed
+dual orbits.  For arbitrary finite abelian groups, we prove that the smallest
+such orbit is the exact minimax parameter throughout an explicit
+character-order-dependent budget range, always larger than $1/2$.  We determine
+the exact energy capacity of a conjugate-character packet, and packet-supported
+channels give the matching lower bound for every joint distribution on the
+automorphisms.  We characterize optimal actions on
+elementary abelian groups and the exact projective seed requirement for field
+multipliers at every strictly interior feasible budget.  A full-spectrum erasure
+witness extends the minimax
+value, though not the uniqueness classification, to every feasible energy budget
+whenever there is a single nontrivial inversion-closed orbit.  Finally, we show that
 metadata-aware leakage can cancel every local bijection, making the disclosure
 order essential.  The result is one-shot and does not cover joint leakage or
 remeasurement after disclosure.
@@ -80,13 +90,22 @@ nonconstant Fourier energy across dual-group orbits.
 \paragraph{Contributions.}
 Within the temporal experiment formalized in Section~\ref{sec:model}, we prove:
 \begin{enumerate}
-    \item an exact, fixed-secret $\chitwo$ identity over every finite field;
+    \item an exact, fixed-secret $\chitwo$ identity over every finite field,
+          with pairwise statistical and arbitrary-prior mutual-information
+          consequences;
     \item an exact dual-orbit identity for finite abelian groups and arbitrary
           automorphism subgroups;
-    \item a matching minimax lower bound over $\F_{2^n}$ for local $\chitwo$
-          budgets in $[0,1]$, witnessed by binary one-character channels;
-    \item uniqueness and multiplier-seed entropy consequences for the uniform
-          relative-multiplier distribution; and
+    \item a minimax classification for arbitrary finite abelian groups showing
+          that the smallest inversion-closed dual orbit is the exact security
+          parameter throughout an explicit character-order-dependent local
+          $\chitwo$ budget range;
+    \item the exact energy capacity of a channel supported on one conjugate
+          character packet;
+    \item optimality of projectively transitive actions on elementary abelian
+          groups, together with an exact seed-entropy characterization for field
+          multipliers at every strictly interior feasible budget;
+    \item a full-energy minimax identity for actions with one nontrivial real
+          orbit; and
     \item an impossibility observation showing that arbitrary leakage functions
           can undo local bijections when the metadata is available during leakage.
 \end{enumerate}
@@ -96,7 +115,9 @@ Leakage followed by a reveal phase is established in stronger secret-sharing
 models~\cite{ckos21,hvw25}; those works reveal additional shares or support
 equivocation, rather than analyzing the hidden encoding metadata used here.
 After-the-fact leakage is also established terminology in other primitives.
-We do not claim that the chronology itself is new.  Our model is weaker than
+Our transcript is also a designated-unauthorized-set instance of the standard
+nonadaptive local-leakage experiment~\cite{sv19}.  We do not claim that the
+chronology itself is new.  Our model is weaker than
 adaptive or joint leakage: channels cannot depend on the hidden recovery capsule,
 their outputs are conditionally independent, and no new leakage is taken after
 disclosure.  Section~\ref{sec:related} gives a conservative comparison.
@@ -113,6 +134,13 @@ and
 \[
   \TV(P,M)=\frac12\sum_{\omega}|P(\omega)-M(\omega)|.
 \]
+We write
+\[
+  D(P\Vert M)=\sum_\omega P(\omega)
+       \log\frac{P(\omega)}{M(\omega)}
+\]
+for relative entropy, with natural logarithms.  Information quantities are
+therefore measured in nats; division by $\log 2$ gives bits.
 The Cauchy--Schwarz inequality gives
 \begin{equation}\label{eq:tvchi}
   \TV(P,M)\leq \frac12\sqrt{\chitwo(P\Vert M)}.
@@ -128,7 +156,7 @@ for $f:G\to\mathbb{C}$,
 Using a conjugate in this definition only relabels characters.  Orthogonality and
 Parseval take the forms
 \begin{align}
- \E_x\gamma(x)\overline{\psi(x)}&=\mathbf 1[\gamma=\psi],\label{eq:orth}\
+ \E_x\gamma(x)\overline{\psi(x)}&=\mathbf 1[\gamma=\psi],\label{eq:orth}\\
  \E_x|f(x)|^2&=\sum_{\gamma\in\widehat G}|\widehat f(\gamma)|^2.
  \label{eq:parseval}
 \end{align}
@@ -156,7 +184,7 @@ Since $\E_xg(x,z)=0$, Parseval implies
 \begin{lemma}[Output-alphabet bound]\label{lem:alphabet}
 For every finite-output channel $W:G\to\mathcal Z$,
 \[
- e(W)\leq |\supp(Z)|-1.
+ e(W)\leq \min\{|G|-1,|\supp(Z)|-1\}.
 \]
 If $W$ is a deterministic function with exactly $r$ attained outputs, then
 $e(W)=r-1$.
@@ -174,10 +202,35 @@ most one.  The constant functions give one singular value equal to one, while
    =\sum_{x,z}\frac{P_{X,Z}(x,z)^2}{P_X(x)P_Z(z)}
    =1+e(W).
 \]
-Since $\operatorname{rank}K\leq |\supp(Z)|$, the other squared singular values
-sum to at most $|\supp(Z)|-1$.  For deterministic $W$ with $r$ nonempty
+Since $\operatorname{rank}K\leq\min\{|G|,|\supp(Z)|\}$, the other squared
+singular values sum to at most the stated minimum.  For deterministic $W$ with $r$ nonempty
 fibers, the $r$ normalized columns are orthonormal, so all $r$ nonzero singular
 values equal one.
+\end{proof}
+
+\begin{lemma}[Full-spectrum erasure channel]\label{lem:erasure}
+Let $|G|=Q$.  For every $0\leq\varepsilon\leq Q-1$, there is a channel
+$W_\varepsilon$ with $e(W_\varepsilon)=\varepsilon$ and
+\[
+ E_{W_\varepsilon}(\gamma)=\frac{\varepsilon}{Q-1}
+ \qquad(\gamma\neq1).
+\]
+\end{lemma}
+
+\begin{proof}
+Put $\rho=\varepsilon/(Q-1)$ and use output alphabet $G\cup\{\bot\}$, with
+\[
+ W_\varepsilon(\bot\mid x)=1-\rho,\qquad
+ W_\varepsilon(y\mid x)=\rho\mathbf1[y=x].
+\]
+The erasure output has zero centered response.  For $y\in G$ and
+$\gamma\neq1$, its centered reveal response has Fourier coefficient
+\[
+ \E_x\gamma(x)(Q\mathbf1[x=y]-1)=\gamma(y).
+\]
+Averaging its squared magnitude with output mass $\rho/Q$ over all $y$ gives
+$E_{W_\varepsilon}(\gamma)=\rho$.  Summing the $Q-1$ nontrivial frequencies
+gives the claimed total energy.
 \end{proof}
 
 \section{Delayed-disclosure experiment}\label{sec:model}
@@ -211,6 +264,44 @@ For each $i$, let $q_i$ and $e_i=e(W_i)$ be defined as in
 Equations~\eqref{eq:energy}--\eqref{eq:spectral-energy} for a uniform field
 input.  Every $X_i$ is marginally uniform for every fixed secret.  Consequently,
 $q_i$ is also the fixed-secret marginal of $Z_i$.
+
+\subsection{Relation to the standard local-leakage game}
+
+The temporal presentation is useful operationally, but it does not define a new
+indistinguishability game.  Treat the capsule as one additional, designated
+component.
+
+\begin{proposition}[Standard-game embedding]\label{prop:embedding}
+The tuple $(R,X_1,\ldots,X_d)$ is a perfect $(d+1)$-out-of-$(d+1)$ secret
+sharing of $s$, with a nonuniform share size.  In the nonadaptive local-leakage
+game, fix the unauthorized set to the capsule component, reveal $R$ completely,
+and apply capsule-independent local channels $W_i$ to the remaining components.
+The resulting view is identically distributed to $(R,Z_1,\ldots,Z_d)$ in the
+delayed-disclosure experiment.
+\end{proposition}
+
+\begin{proof}
+Correctness is Equation~\eqref{eq:reconstruct}.  If $R$ is present but some
+$X_j$ is absent, invert the known local bijections.  The view then contains at
+most $d-1$ additive shares, whose distribution is independent of $s$.  If $R$
+is absent, the entire tuple $(X_1,\ldots,X_d)$ is independent and uniform:
+$B$ makes $X_1$ uniform independently of $(U_2,\ldots,U_d)$, that latter tuple
+is uniform for fixed $s$, and the independently sampled nonzero multipliers
+preserve uniformity.  Thus every proper component set has perfect privacy.
+
+In the stated nonadaptive game, the channels are fixed without the corrupted
+component $R$.  Sampling the sharing, evaluating the local channels, and then
+returning $R$ gives exactly the joint law in our experiment; changing only the
+order in which the already sampled outputs are handed to the adversary does not
+change that law.
+\end{proof}
+
+Proposition~\ref{prop:embedding} is only an embedding for the designated
+unauthorized set consisting of the capsule.  We do not prove local-leakage
+resilience for every unauthorized set, as required of a full leakage-resilient
+secret-sharing construction.  Moreover, allowing the leakage channels to depend
+on the revealed component is the stronger local-leakage order and is impossible
+for these bijections by Proposition~\ref{prop:cancellation} below.
 
 \section{Exact field identity}
 
@@ -303,6 +394,56 @@ reference $P_R\prod_iq_i$, Theorem~\ref{thm:field}, and
 Lemma~\ref{lem:alphabet}.
 \end{proof}
 
+\begin{corollary}[Arbitrary-prior information leakage]\label{cor:mutual-information}
+Let $S$ have any distribution on $F$, independently of the sharing and capsule
+randomness, and put $T=(R,Z_1,\ldots,Z_d)$.  Then
+\[
+ I(S;T)\leq
+ \log\left(1+\frac{\prod_i e_i}{(Q-1)^{d-1}}\right).
+\]
+If each leakage output has at most $2^{\ell_i}$ values, the numerator may be
+replaced by $\prod_i(2^{\ell_i}-1)$.
+\end{corollary}
+
+\begin{proof}
+Write $P_s=P_{T\mid S=s}$, $P_T=\sum_s\Prb[S=s]P_s$, and
+$M=P_R\prod_iq_i$.  The relative-entropy barycenter identity gives
+\[
+ \sum_s\Prb[S=s]D(P_s\Vert M)
+   =I(S;T)+D(P_T\Vert M).
+\]
+For any $P\ll M$, Jensen's inequality under $P$ gives
+\[
+ D(P\Vert M)
+  \leq \log\E_{\omega\leftarrow P}\frac{P(\omega)}{M(\omega)}
+  =\log\bigl(1+\chitwo(P\Vert M)\bigr).
+\]
+Theorem~\ref{thm:field} gives the same value of the chi-square divergence for
+every $s$.  Dropping the nonnegative term $D(P_T\Vert M)$ proves the first
+claim; Lemma~\ref{lem:alphabet} proves the alphabet-size specialization.
+\end{proof}
+
+\begin{remark}[Equal-alphabet scaling]\label{rem:scaling}
+If every leakage output has support size at most $L$, put
+$\rho=(L-1)/(Q-1)$.  Corollaries~\ref{cor:tv} and
+\ref{cor:mutual-information} give
+\[
+ \TV(P_{T\mid S=s},P_{T\mid S=t})
+    \leq \sqrt{Q-1}\,\rho^{d/2},
+ \qquad
+ I(S;T)\leq\log\bigl(1+(Q-1)\rho^d\bigr).
+\]
+Thus, when $1<L<Q$, pairwise distance is at most a target $\delta>0$ whenever
+\[
+ d\geq
+ \frac{\log(Q-1)-2\log\delta}
+      {\log((Q-1)/(L-1))}.
+\]
+For $L=1$, all local outputs are constant and both leakage measures vanish.
+The formula gives an upper bound, not a claim that bounded-alphabet channels
+attain it simultaneously for every parameter choice.
+\end{remark}
+
 \section{Finite abelian groups and dual orbits}
 
 Let $G$ be a finite abelian group and $H\leq\Aut(G)$.  Additively share
@@ -345,85 +486,369 @@ $\F_Q$.  Theorem~\ref{thm:field} is therefore the single-nontrivial-orbit case
 of Theorem~\ref{thm:orbit}.
 \end{remark}
 
-\section{Minimax multiplier randomization}
+\section{Real dual orbits and minimax automorphism randomization}
 
-We next allow the relative multiplier tuple
-$A=(A_2,\ldots,A_d)$ to have an arbitrary distribution $D$ on
-$(F^{*})^{d-1}$, while $B$ remains uniform and independent.  For prescribed
-budgets $\varepsilon_i$, let
+Complex characters occur in conjugate pairs because channel probabilities are
+real.  Indeed, $g_i(x,z)$ is real, so
+\begin{equation}\label{eq:conjugate-energy}
+ E_{W_i}(\gamma^{-1})=E_{W_i}(\gamma).
+\end{equation}
+For $H\leq\Aut(G)$, define the real $H$-orbit of a nontrivial character by
 \[
- \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
+ \mathcal C_H(\gamma)=H\cdot\gamma\ \cup\ H\cdot\gamma^{-1}.
+\]
+These sets partition $\widehat G\setminus\{1\}$.  They are the orbits obtained
+after adjoining character inversion to the $H$-action.  Put
+\[
+ e_i^{\mathbb R}(\mathcal C)
+   =\sum_{\gamma\in\mathcal C}E_{W_i}(\gamma),
+ \qquad
+ m_{\mathbb R}(H)=\min_{\gamma\neq1}|\mathcal C_H(\gamma)|.
+\]
+
+\begin{corollary}[Exact real-orbit identity]\label{cor:real-orbit}
+In the experiment of Theorem~\ref{thm:orbit},
+\begin{equation}\label{eq:real-orbit}
+ \chitwo\left(P_{R,Z\mid S=s}\middle\Vert P_R\prod_iq_i\right)
+ =\sum_{\mathcal C}
+   \frac{\prod_i e_i^{\mathbb R}(\mathcal C)}
+        {|\mathcal C|^{d-1}},
+\end{equation}
+where the sum is over nontrivial real $H$-orbits.
+\end{corollary}
+
+\begin{proof}
+A real orbit $\mathcal C$ is either one inversion-stable $H$-orbit or the
+disjoint union of two $H$-orbits $\mathcal O$ and $\mathcal O^{-1}$ of equal
+size.  The first case contributes the displayed term directly in
+Theorem~\ref{thm:orbit}.  In the second case,
+Equation~\eqref{eq:conjugate-energy} gives
+$e_i(\mathcal O)=e_i(\mathcal O^{-1})=
+e_i^{\mathbb R}(\mathcal C)/2$ and
+$|\mathcal O|=|\mathcal C|/2$.  The sum of the two terms is therefore
+\[
+ 2\frac{\prod_i(e_i^{\mathbb R}(\mathcal C)/2)}
+          {( |\mathcal C|/2)^{d-1}}
+ =\frac{\prod_i e_i^{\mathbb R}(\mathcal C)}{|\mathcal C|^{d-1}}.
+\]
+\end{proof}
+
+For an integer $k\geq2$, define the packet capacity
+\begin{equation}\label{eq:packet-capacity}
+ \kappa(k)=
+ \begin{cases}
+  1,&k=2,\\
+  \bigl(2\cos^2(\pi/k)\bigr)^{-1},&k\geq3.
+ \end{cases}
+\end{equation}
+
+\begin{lemma}[Exact conjugate-packet capacity]\label{lem:packet-capacity}
+Let $\beta$ be a character of order $k\geq2$, and consider finite-output
+channels whose nonconstant spectral energy is supported on
+$P_\beta=\{\beta,\beta^{-1}\}$.  The largest possible total energy is
+$\kappa(k)$.  Every energy in $[0,\kappa(k)]$ is attainable, split equally
+between the characters when $k\geq3$.
+\end{lemma}
+
+\begin{proof}
+If $k=2$, a real centered likelihood response supported on $P_\beta$ has the
+form $g(x,z)=a_z\beta(x)$.  Nonnegativity of $1+g$ gives $|a_z|\leq1$, so
+$e(W)=\E_z a_z^2\leq1$.  The binary channel
+$W(z\mid x)=(1+z\beta(x))/2$ attains one, and scaling its response attains all
+smaller energies.
+
+Now let $k\geq3$.  For every output $z$, Fourier inversion and reality give
+\[
+ g(x,z)=a_z\beta(x)+\overline{a_z}\beta(x)^{-1}
+       =2\operatorname{Re}(a_z\beta(x)).
+\]
+Write $a_z=\rho e^{\mathrm{i}\theta}$.  Among the $k$ values of $\beta(x)$,
+one lies within angle $\pi/k$ of the direction opposite to
+$e^{\mathrm{i}\theta}$.  Hence
+\[
+ \min_x\operatorname{Re}(e^{\mathrm{i}\theta}\beta(x))
+ \leq-\cos(\pi/k).
+\]
+Nonnegativity of $1+g(x,z)$ implies
+$\rho\leq(2\cos(\pi/k))^{-1}$.  Since the two spectral energies are equal,
+\[
+ e(W)=2\E_z|a_z|^2\leq\frac{1}{2\cos^2(\pi/k)}.
+\]
+
+For attainment, let $\zeta=e^{2\pi\mathrm{i}/k}$ and choose a phase $\theta$
+for which the preceding minimum equals $-\cos(\pi/k)$.  Set
+$a_j=(2\cos(\pi/k))^{-1}e^{\mathrm{i}\theta}\zeta^j$ and
+\[
+ W(j\mid x)=\frac1k\left(1+2\operatorname{Re}(a_j\beta(x))\right),
+ \qquad 0\leq j<k.
+\]
+Each probability is nonnegative, and they sum to one because
+$\sum_j a_j=0$.  The output is uniform under uniform $x$, all $|a_j|$ attain
+the radius bound, and the energy is $\kappa(k)$.  Scaling every $a_j$ by a
+factor in $[0,1]$ attains every smaller energy.
+\end{proof}
+
+Define the usable capacity of the smallest real orbits by
+\begin{equation}\label{eq:min-capacity}
+ \kappa_{\min}(H)=
+ \max_{\substack{\gamma\neq1\\
+       |\mathcal C_H(\gamma)|=m_{\mathbb R}(H)}}
+       \kappa(\operatorname{ord}(\gamma)).
+\end{equation}
+Automorphisms and inversion preserve character order, so this quantity is
+constant within each orbit considered in the maximum.  Notice that
+$\kappa_{\min}(H)>1/2$ for every fixed finite group, although $1/2$ is the
+uniform lower bound as character orders grow.
+
+Keep $B$ uniform and independent, but now allow $(h_2,\ldots,h_d)$ to have an
+arbitrary joint distribution $D$ on $H^{d-1}$.  Define
+\[
+ \mathcal R_H(D;\varepsilon_1,\ldots,\varepsilon_d)
  =\sup_{W_i:e(W_i)\leq\varepsilon_i}
    \chitwo(P_{R,Z\mid S=s}\Vert P_R\prod_iq_i).
 \]
-The value may depend on the fixed $s$ a priori, although the witnesses below do
-not.
 
-\begin{theorem}[Minimax identity]\label{thm:minimax}
-Let $F=\F_{2^n}$, $Q=2^n$, and $0\leq\varepsilon_i\leq1$.  Then
+\begin{theorem}[Real-orbit minimax identity]\label{thm:minimax}
+Let $G$ be a nontrivial finite abelian group, $H\leq\Aut(G)$, and
+$0\leq\varepsilon_i\leq\kappa_{\min}(H)$.  Then
 \begin{equation}\label{eq:minimax}
- \inf_D\mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
- =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+ \inf_{D\text{ on }H^{d-1}}
+ \mathcal R_H(D;\varepsilon_1,\ldots,\varepsilon_d)
+ =\frac{\prod_i\varepsilon_i}{m_{\mathbb R}(H)^{d-1}}.
 \end{equation}
-Uniform $D$ attains the infimum.  If every $\varepsilon_i>0$, it is the unique
-attaining distribution on the relative multiplier tuple.
+Independent uniform automorphisms attain the infimum.  The matching lower bound
+uses channels supported only on the conjugate packets of a smallest real orbit
+attaining Equation~\eqref{eq:min-capacity}.
 \end{theorem}
 
 \begin{proof}
-For uniform $D$, Theorem~\ref{thm:field} gives
-\[
- \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
- \leq\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
-\]
+For independent uniform automorphisms, Corollary~\ref{cor:real-orbit} and
+nonnegativity give
+\begin{align*}
+ \chitwo(P_{R,Z\mid S=s}\Vert P_R\textstyle\prod_iq_i)
+ &\leq\frac{1}{m_{\mathbb R}(H)^{d-1}}
+      \sum_{\mathcal C}\prod_i e_i^{\mathbb R}(\mathcal C)\\
+ &\leq\frac{1}{m_{\mathbb R}(H)^{d-1}}
+      \prod_i\sum_{\mathcal C}e_i^{\mathbb R}(\mathcal C)\\
+ &\leq\frac{\prod_i\varepsilon_i}{m_{\mathbb R}(H)^{d-1}}.
+\end{align*}
+The middle inequality retains the diagonal real-orbit products from the
+nonnegative product-of-sums expansion.
 
-For the converse, write the nontrivial additive characters as
+For the converse, fix a smallest real orbit $\mathcal C$ attaining
+Equation~\eqref{eq:min-capacity} and a character
+$\beta_1\in\mathcal C$.  Write
 \[
- \chi_\beta(x)=(-1)^{\operatorname{Tr}(\beta x)},\qquad \beta\in F^{*},
+ P_\beta=\{\beta,\beta^{-1}\},\qquad r=|P_{\beta_1}|\in\{1,2\}.
 \]
-where $\operatorname{Tr}:F\to\F_2$ is the absolute trace.  For
-$z\in\{-1,+1\}$ define
-\begin{equation}\label{eq:witness-channel}
- W_{i,\beta_i}(z\mid x)
- =\frac12\left(1+z\sqrt{\varepsilon_i}\chi_{\beta_i}(x)\right).
+The $H$-orbit of $P_{\beta_1}$ consists of $N=|\mathcal C|/r$ character
+packets.  For $(h_2,\ldots,h_d)\leftarrow D$, the tuple
+\[
+ Y=(h_2\cdot P_{\beta_1},\ldots,h_d\cdot P_{\beta_1})
+\]
+has at most $N^{d-1}$ values.  Choose a value
+$y=(P_{\beta_2},\ldots,P_{\beta_d})$ of mass at least $N^{-(d-1)}$.
+
+By Lemma~\ref{lem:packet-capacity}, for every $i$ there is a channel with total
+energy $\varepsilon_i$, divided equally among the $r$ characters in
+$P_{\beta_i}$ and zero elsewhere.  The construction depends only on the packet,
+not on the representative.
+
+For arbitrary $D$, the translation average and local-output independence give
+the exact diagonal expression
+\begin{equation}\label{eq:arbitrary-D}
+ \sum_{\gamma\neq1} E_{W_1}(\gamma)
+   \E_{(h_2,\ldots,h_d)\leftarrow D}
+      \prod_{i=2}^{d}E_{W_i}(h_i\cdot\gamma).
 \end{equation}
-This is a valid channel because $\varepsilon_i\leq1$.  Its output is uniform,
-and its centered response has energy $\varepsilon_i$ at the single character
-$\chi_{\beta_i}$.
-
-Fix any tuple $a=(a_2,\ldots,a_d)\in(F^{*})^{d-1}$.  Choose
-$\beta_1\neq0$ arbitrarily and set $\beta_i=\beta_1a_i^{-1}$.  In the Fourier
-expansion, the channels in Equation~\eqref{eq:witness-channel} align if and only
-if the relative multiplier tuple equals $a$.  The translation average removes
-all cross terms, so the resulting divergence is
+No independence among the $h_i$ is used.  For the packet channels above, the
+$r$ characters in $P_{\beta_1}$ contribute exactly when $Y=y$.  Hence their
+divergence is
 \[
-  \left(\prod_i\varepsilon_i\right)D(a).
+ \frac{\prod_i\varepsilon_i}{r^{d-1}}\Pr[Y=y]
+ \geq\frac{\prod_i\varepsilon_i}{(rN)^{d-1}}
+ =\frac{\prod_i\varepsilon_i}{|\mathcal C|^{d-1}}.
 \]
-Selecting a largest atom gives
-\[
- \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
- \geq\left(\prod_i\varepsilon_i\right)\max_aD(a)
- \geq\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
-\]
-If the product is positive, equality requires all $(Q-1)^{d-1}$ atoms of $D$
-to be equal.
+This holds for every $D$ and matches the upper bound.
 \end{proof}
 
-\begin{corollary}[Multiplier-seed entropy]\label{cor:entropy}
-Within the multiplier compiler of Theorem~\ref{thm:minimax}, attaining the exact
-minimax value for positive budgets requires the relative multiplier tuple to be
-uniform.  Any random seed from which that tuple is deterministically generated
-therefore has min-entropy at least
+\begin{corollary}[Single-real-orbit minimax for all energies]
+\label{cor:all-energy}
+Let $|G|=Q$ and suppose $H$, together with character inversion, is transitive
+on $\widehat G\setminus\{1\}$.  For every feasible budget
+$0\leq\varepsilon_i\leq Q-1$,
 \[
-  (d-1)\log_2(Q-1).
+ \inf_{D\text{ on }H^{d-1}}
+ \mathcal R_H(D;\varepsilon_1,\ldots,\varepsilon_d)
+ =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
 \]
+Independent uniform automorphisms attain the infimum.
 \end{corollary}
 
-This corollary does not lower-bound the randomness needed for the translation
-$B$, nor does it apply to arbitrary nonlocal encodings.
+\begin{proof}
+There is one nontrivial real orbit, so Corollary~\ref{cor:real-orbit} gives the
+upper bound for independent uniform automorphisms.  Against arbitrary $D$, give
+party $i$ the channel from Lemma~\ref{lem:erasure}.  Substitution in
+Equation~\eqref{eq:arbitrary-D} gives
+\[
+ (Q-1)\prod_i\frac{\varepsilon_i}{Q-1}
+ =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}},
+\]
+independently of $D$.
+\end{proof}
+
+\begin{corollary}[Optimal actions on vector spaces]\label{cor:actions}
+Let $G\cong\F_p^n$, $Q=p^n$, and suppose
+$0<\varepsilon_i\leq\kappa(p)$.  The best minimax value among
+automorphism subgroups is
+\[
+ \frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\]
+It is attained exactly when $H$, together with character inversion, acts
+transitively on the nontrivial characters.  Equivalently, $H$ is transitive on
+the conjugate-character packets.  If $r=1$ for $p=2$ and $r=2$ for odd $p$,
+every such $H$ has order at least $(Q-1)/r$.
+\end{corollary}
+
+\begin{proof}
+There are $Q-1$ nontrivial characters, so
+$m_{\mathbb R}(H)\leq Q-1$, with equality exactly under the stated
+transitivity condition.  Such an action exists because
+$\operatorname{GL}(n,p)$ is transitive on nonzero dual vectors.  The induced
+$H$-action on the $(Q-1)/r$ packets is transitive, so orbit--stabilizer gives
+the order bound.
+\end{proof}
+
+\begin{corollary}[Field multipliers and projective seed entropy]
+\label{cor:entropy}
+Let $G$ be the additive group of $F=\F_Q$ and let $H=F^*$ act by scalar
+multiplication.  Put $r=1$ in characteristic two and $r=2$ otherwise, and let
+$N=(Q-1)/r$.  For every $0\leq\varepsilon_i\leq Q-1$,
+\[
+ \inf_D\mathcal R_H(D;\varepsilon_1,\ldots,\varepsilon_d)
+ =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\]
+Every $D$ whose projection onto $(F^*/\{\pm1\})^{d-1}$ is uniform attains this
+value for all feasible budgets.  If
+$0<\varepsilon_i<Q-1$ for every $i$, the converse also holds: $D$ attains if
+and only if that projection is uniform.  Any seed producing an attaining tuple
+deterministically in this strict-interior range therefore has min-entropy at
+least $(d-1)\log_2 N$.  In characteristic two, the multiplier tuple itself is
+the unique minimizer throughout the strict interior.
+\end{corollary}
+
+\begin{proof}
+Nonzero field scalars act transitively on the nontrivial additive characters,
+so their single real orbit has size $Q-1$.  The minimax value for all feasible
+budgets follows from Corollary~\ref{cor:all-energy}.
+
+Identify the conjugate-character packets with the abelian group
+$K=F^*/\{\pm1\}$, which has order $N$.  For a channel $W_i$, let
+$v_i(c)$ be its total spectral energy in packet $c\in K$.  Reality divides that
+energy equally among the $r$ characters in the packet.  If
+$Y_i\in K$ is the inverse of the projected multiplier and $\mu$ is the joint
+law of $(Y_2,\ldots,Y_d)$, Equation~\eqref{eq:arbitrary-D} becomes
+\begin{equation}\label{eq:packet-correlation}
+ \frac{1}{r^{d-1}}\sum_{c\in K}v_1(c)
+   \E_{Y\leftarrow\mu}\prod_{i=2}^d v_i(Y_i c).
+\end{equation}
+In particular, a uniform $\mu$ makes the $d-1$ aligned packets independent and
+uniform.  Equation~\eqref{eq:packet-correlation} is then
+$\prod_i e(W_i)/(Q-1)^{d-1}$ for arbitrary channels, proving sufficiency at
+every budget.
+
+We prove necessity when every budget is strictly between zero and $Q-1$.  Put
+$p=\operatorname{char}(F)$ and $\kappa=\kappa(p)$.  For each
+$0<\varepsilon<Q-1$, construct a channel whose packet-energy vector has the
+form
+\begin{equation}\label{eq:spiked-packet-vector}
+ v(c)=a+b\mathbf1[c=c_0],\qquad a\geq0,\quad b>0,
+\end{equation}
+and sums to $\varepsilon$.  If $\varepsilon\leq\kappa$, tagged time sharing
+between a capacity-achieving packet channel and an input-independent channel
+gives $a=0$ and $b=\varepsilon$.  If
+$\kappa<\varepsilon<Q-1$, necessarily $\kappa<Q-1$; tagged time sharing
+between the full-reveal endpoint of Lemma~\ref{lem:erasure} and a
+capacity-achieving packet channel, with weights
+\[
+ t=\frac{\varepsilon-\kappa}{Q-1-\kappa},\qquad
+ u=\frac{Q-1-\varepsilon}{Q-1-\kappa},
+\]
+gives $a=rt$ and $b=u\kappa$.  Disjoint output tags make spectral energies the
+corresponding convex combination.  Both weights are nonnegative and $b>0$.
+
+Normalize $v_i$ to a probability distribution $p_i=v_i/\varepsilon_i$ on
+$K$.  Every Fourier coefficient of $p_i$ is nonzero: the trivial coefficient
+is one, while every nontrivial coefficient comes only from the positive spike
+in Equation~\eqref{eq:spiked-packet-vector}.  Let independent
+$C_i\leftarrow p_i$ and put
+\[
+ V=(C_2C_1^{-1},\ldots,C_dC_1^{-1})\in K^{d-1}.
+\]
+For every character tuple $(\eta_2,\ldots,\eta_d)$ of $K^{d-1}$,
+\[
+ \widehat P_V(\eta_2,\ldots,\eta_d)
+ =\widehat p_1\left((\textstyle\prod_{i=2}^d\eta_i)^{-1}\right)
+    \prod_{i=2}^d\widehat p_i(\eta_i)\neq0.
+\]
+Thus convolution by $P_V$ is injective on functions on $K^{d-1}$.
+Moving the spike $c_0$ independently in each local channel translates the law
+of $V$ by an arbitrary element of $K^{d-1}$.  After normalization,
+Equation~\eqref{eq:packet-correlation} is the inner product of $\mu$ with one
+of these translates, multiplied by
+$r^{1-d}\prod_i\varepsilon_i$.  If $\mu$ is nonuniform, injectivity makes
+these inner products nonconstant.  Their average over all translates is
+$N^{-(d-1)}$, so one is strictly larger.  The corresponding channels give
+divergence strictly larger than
+\[
+ r^{1-d}\frac{\prod_i\varepsilon_i}{N^{d-1}}
+ =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\]
+Hence a minimizer in the strict interior must have uniform projection.
+
+Finally, if that uniform projected tuple is a deterministic function of a seed
+$K_0$, every seed atom lies in an output fiber of probability $N^{-(d-1)}$.
+Thus $\max_k\Pr[K_0=k]\leq N^{-(d-1)}$, proving the entropy claim.
+\end{proof}
+
+\begin{corollary}[Field-compiler resource accounting]\label{cor:resources}
+Fix a section $\sigma:F^*/\{\pm1\}\to F^*$.  Sample $B$ uniformly in $F$ and
+sample $(C_2,\ldots,C_d)$ uniformly in
+$(F^*/\{\pm1\})^{d-1}$, independently of $B$, then use
+$A_i=\sigma(C_i)$.  This realizes the minimax value of
+Corollary~\ref{cor:entropy} at every feasible budget using exactly
+\[
+ \log_2 Q+(d-1)\log_2\frac{Q-1}{r}
+\]
+bits of random entropy beyond the randomness of the original additive sharing.
+The capsule has $Q((Q-1)/r)^{d-1}$ possible values and hence admits a
+fixed-length index of
+\[
+ \left\lceil\log_2 Q+(d-1)\log_2\frac{Q-1}{r}\right\rceil
+\]
+bits.  In the strict-interior regime, no deterministic multiplier seed attaining
+the minimax value can have smaller min-entropy.  The encoded shares remain $d$
+field elements.  Given precomputed $A_i^{-1}$, reconstruction uses one field
+subtraction, $d-1$ field multiplications, and $d-1$ field additions.
+\end{corollary}
+
+\begin{proof}
+The projected multiplier tuple is uniform, so Corollary~\ref{cor:entropy} gives
+the minimax value.  Its support has $N^{d-1}$ equally likely elements and is
+independent of the $Q$-ary uniform translation, proving the entropy and indexing
+claims.  The strict-interior lower bound is the final statement of
+Corollary~\ref{cor:entropy}.  The operation count follows directly from
+Equation~\eqref{eq:reconstruct}.
+\end{proof}
+
+This accounting is for the stated local-automorphism compiler.  It does not
+lower-bound the translation randomness of a different compiler or the cost of
+arbitrary nonlocal encodings.  Serialized field elements may also require
+padding beyond the ideal index lengths above.
 
 \section{Why disclosure order is essential}
 
-\begin{proposition}[Cancellation of metadata-aware bijections]
+\begin{proposition}[Cancellation of metadata-aware bijections]\label{prop:cancellation}
 Suppose a local randomized encoding has the form $x=\pi_\rho(u)$, where
 $\pi_\rho$ is a bijection and the metadata $\rho$ is available to a leakage
 function.  For every leakage function $f$ on the original share, there is a
@@ -436,13 +861,14 @@ leakage obtains no information-theoretic protection from such bijections.
 \end{proposition}
 
 For the field construction, the attack can be made explicit.  If the metadata is
-available during leakage, let
+available during leakage, put $p=\operatorname{char}(F)$, let
+$\operatorname{Tr}:F\to\F_p$ be the field trace, and set
 \[
  \ell_1(B,X_1)=\operatorname{Tr}(X_1-B),\qquad
  \ell_i(A_i,X_i)=\operatorname{Tr}(A_i^{-1}X_i).
 \]
-The xor of the leaked bits is $\operatorname{Tr}(s)$.  Thus public multipliers
-do not repair the standard small-characteristic attack.
+The sum of the leaked $p$-ary symbols is $\operatorname{Tr}(s)$.  Thus public
+multipliers do not repair the standard character attack.
 
 \section{Related work and novelty boundary}\label{sec:related}
 
@@ -453,14 +879,72 @@ tight or broader estimates for additive and linear sharing
 ~\cite{mpsw21,maji22tight,maji22bounded}.  These works establish the basic
 dual-code product mechanism on which our calculation depends.
 
+Benhamouda et al. also prove impossibility results for noninteractive local share
+conversion from prime-field additive sharing to binary sharing~\cite{bdir18}.
+Our transformation is not such a conversion: it preserves the share alphabet,
+uses correlated recovery metadata outside the leaking components, and reconstructs
+only after that metadata is supplied.  This distinction avoids a formal
+contradiction, but it also emphasizes that the capsule is additional protected
+state rather than a free local recoding of the original scheme.
+
 Faust, Masure, Micheli, Orlt, and Standaert connect the same Fourier framework to
 physical prime-field masking, including exact expressions for average and
 worst-case statistical metrics~\cite{faust24practice}.  Their results make clear
+that conjugate Fourier harmonics have equal magnitude for real leakage, and use
+that symmetry to sharpen a physical-leakage estimate.  We do not claim this
+conjugate-energy observation.  Their results also make clear
 that the hidden translation in our construction, viewed alone, is not a
 substantial mathematical advance: it changes which average is represented in
 the transcript.  The candidate contribution here is the channel-independent
 $\chitwo$ factorization after automorphism averaging, its orbit decomposition,
 and the matching minimax attack.
+
+Jahandideh, Mennink, and Batina analyze ordinary additive masking with
+probabilistic noisy leakage, including binary-projection decompositions, tight
+success-rate bounds in characteristic two, prime-field estimates, and a security
+criterion for finite abelian groups~\cite{jahandideh25decomposition}.  They also
+use an erasure/random-probing channel as a comparison object.  Arbitrary noisy
+share channels, group-valued masking, projection decompositions, and erasure
+witnesses are therefore established ingredients.  Their sharing is not freshly
+conjugated by a hidden automorphism action and their objective does not optimize
+a distribution on such actions, but this distinction confines our candidate
+contribution to the exact capsule-conditioned identity and orbit minimax problem.
+
+Koga and Abe give tighter bounds for the ordinary additive $(n,n)$ scheme over
+prime fields by diagonalizing circulant matrices~\cite{koga25circulant}.  Their
+stated model maximizes pairwise total variation over deterministic $L$-ary local
+leakage functions.  For $L=2$ they determine the asymptotic order and
+characterize extremizing leakage functions; for larger $L$ they use
+majorization.  This is the closest current antecedent for local spectral
+extremizers and may subsume elementary parts of our packet-capacity argument.
+It does not make the hidden-randomizer problem unnecessary: our optimization is
+over distributions of per-sharing automorphisms, uses stochastic channels and
+$\chitwo$ divergence, and is governed by dual-action orbits.  Nevertheless, the
+two extremal analyses require a proof-level comparison before any novelty claim
+about Lemma~\ref{lem:packet-capacity} is made.  A subsequent Japanese-language
+SITA paper by Abe and Koga advertises a general formula for worst-case distance
+between one-bit leakages~\cite{abe25general}; its full text is likewise required
+for that comparison.
+
+Recent work on Shamir and code-based sharing further narrows the surrounding
+claim.  Gupta and Mahdavifar model independent arbitrary noisy leakage channels
+on Shamir shares and bound mutual-information, semantic, and distinguishing
+leakage~\cite{gupta24statistical}.  Thus neither stochastic local channels nor an
+information-theoretic wiretap formulation is new here.  Their objective is to
+bound Shamir leakage for a fixed sharing scheme; it does not optimize a hidden
+per-sharing automorphism distribution or state a dual-orbit identity.  Klein and
+Komargodski sharpen bounds for Shamir sharing over prime fields~\cite{klein23};
+Maji, Nguyen, Paskin-Cherniavsky, and Ye construct secure choices over
+composite-order fields~\cite{maji24composite}; and Hwang, Maji, Nguyen, and Ye
+classify secure evaluation places for physical-bit leakage in specified
+regimes~\cite{hwang25places}.  Nguyen proves a physical-bit dichotomy and a
+dual-code characterization for linear code-based sharing over binary extension
+fields, and uses randomized GRS multipliers to select secure scheme
+parameters~\cite{nguyen25linear}.  Random multipliers in secret-sharing design
+are therefore prior art.  Those multipliers are sampled to choose a code, rather
+than freshly hidden for each sharing and disclosed after a snapshot, but this
+distinction concerns the theorem being optimized and not the novelty of scalar
+randomization itself.
 
 Adaptive leakage-and-reveal secret sharing allows leakage on selected shares
 followed by full revelation of different shares~\cite{ckos21}.  A later
@@ -470,6 +954,16 @@ Equivocal secret sharing gives stronger simulation behavior under adaptive
 probing and explicitly motivates leakage protection for data at rest
 ~\cite{hvw25}.  Neither inspected source states the recovery-capsule experiment
 or exact orbit/minimax identity here.
+
+The standard nonadaptive local-leakage definition lets an adversary choose an
+unauthorized set, receive those shares in full, and obtain independently chosen
+local leakage from the remaining shares~\cite{sv19}.  By
+Proposition~\ref{prop:embedding}, our experiment is a designated-set special case
+of that established game after the capsule is treated as an oversized share.
+Srinivasan and Vasudevan give a general compiler with far stronger rate and
+access-structure guarantees.  We therefore make no generic-compiler or new-model
+claim; the possible contribution is the exact algebraic characterization of this
+simple structured instance.
 
 Principal inertia components give a general spectral description of dependence
 through conditional-expectation operators~\cite{calmon17}.  This subsumes the
@@ -487,18 +981,26 @@ The present result has several sharp limitations.
     \item It assumes conditionally independent local channels.  Joint leakage and
           adaptively selected channels are outside the exact identity.
     \item The capsule must occupy a different leakage domain during the snapshot.
-    \item The minimax lower bound covers local $\chitwo$ budgets at most one.
-          Larger budgets require different extremal channels.
-    \item Minimax optimality holds within the relative-multiplier compiler class,
+    \item Viewed as a share, the capsule is oversized, and the theorem handles only
+          the designated unauthorized set containing that share.  It is not a
+          full leakage-resilient secret-sharing construction.
+    \item The minimax lower bound covers the explicit packet-capacity range in
+          Equation~\eqref{eq:min-capacity}.  Larger budgets can force energy onto
+          additional characters and require a different extremal analysis when
+          there is more than one real orbit.
+    \item For field multipliers, projective-uniform randomizers are characterized
+          at every strictly interior budget.  Boundary budgets containing zero
+          or full-reveal energy can have additional minimizers and are not
+          classified here.
+    \item Minimax optimality holds within the local-automorphism compiler class,
           not among all leakage-resilient encodings.
     \item The result has not yet been placed in a composable security framework or
           validated against a concrete physical leakage experiment.
 \end{itemize}
 
-Natural mathematical questions include characterizing the minimax value for
-multiple dual orbits, extending the extremal-channel result beyond characteristic
-two and beyond unit budgets, and determining whether correlated randomizers can
-reduce total seed entropy without weakening the worst-case guarantee.  The main
+Natural mathematical questions include characterizing the minimax value beyond
+the packet-capacity range and determining the complete set of
+minimizing correlated randomizers for general automorphism actions.  The main
 cryptographic question is whether the recovery-capsule chronology yields a useful
 primitive under a recognized snapshot-leakage model.
 
@@ -508,9 +1010,12 @@ Hidden local automorphisms can turn spectral alignment into an exactly
 quantifiable resource when leakage occurs once and the recovery metadata is
 disclosed afterward.  Translation orthogonality removes cross-character terms,
 while automorphism averaging exposes the dual-orbit energy profile.  In the
-single-orbit field case this yields a product identity, and over characteristic
-two concentrated-character attacks show that uniform relative multipliers are
-minimax within the stated class.  The same bijections provide no protection when
+single-orbit field case this yields a product identity.  Over arbitrary finite
+abelian groups, real single-packet attacks show that the smallest
+inversion-closed dual orbit exactly controls the stated minimax problem in the
+proved packet range, while full-spectrum erasure channels determine the value at
+all energies for single-real-orbit actions.  Field multipliers instantiate the
+optimal projectively transitive case.  The same bijections provide no protection when
 their metadata is available to the leakage functions, so any application must
 treat timing and isolation as part of the security boundary.
 
