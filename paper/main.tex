@@ -1,0 +1,520 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prb}{\mathbb{P}}
+\newcommand{\TV}{\mathsf{TV}}
+\newcommand{\chitwo}{\chi^2}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\Aut}{\operatorname{Aut}}
+
+\title{Delayed-Disclosure Twirling for Additive Secret Sharing:\\
+Exact Leakage Identities and Minimax Local Randomization}
+\author{Anonymous research draft}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study additive secret sharing in a temporal leakage experiment.  Before a
+single local-leakage snapshot, one share is translated by a hidden uniform group
+element and the other shares are transformed by hidden random automorphisms.  The
+recovery metadata is disclosed after the snapshot.  For additive sharing over a
+field of order $Q$, we prove that, for every fixed secret and arbitrary
+conditionally independent local stochastic channels, the transcript has exact
+$\chitwo$ divergence
+\[
+    \frac{\prod_{i=1}^d e_i}{(Q-1)^{d-1}}
+\]
+from the product of its recovery-metadata and local-leakage marginals, where
+$e_i$ is the $\chitwo$ information of the $i$th channel under a uniform input.
+We extend the identity to finite abelian groups, where the answer decomposes over
+orbits of the automorphism action on the dual group.  Over $\F_{2^n}$ and for
+local $\chitwo$ budgets at most one, concentrated one-character channels give a
+matching minimax lower bound.  Consequently, uniform relative multipliers are
+minimax within this local-automorphism compiler class and require
+$(d-1)\log_2(Q-1)$ bits of multiplier-seed min-entropy.  Finally, we show that
+metadata-aware leakage can cancel every local bijection, making the disclosure
+order essential.  The result is one-shot and does not cover joint leakage or
+remeasurement after disclosure.
+\end{abstract}
+
+\section{Introduction}
+
+Local leakage of additive and linear secret sharing has been studied using
+Fourier analysis, additive combinatorics, coding theory, and physical leakage
+models~\cite{bdir18,mpsw21,maji22tight,maji22bounded,faust24practice}.
+The basic difficulty is spectral alignment: additive sharing forces the same
+nontrivial character to appear in the Fourier contribution of every local
+leakage function.  An attacker can exploit a common high-energy character across
+the shares.
+
+This paper asks what can be obtained by randomizing that alignment before a
+one-time leakage snapshot.  The randomizer is kept outside the leaking components
+during the snapshot and is disclosed afterward so that the original secret can
+still be reconstructed.  The construction is elementary: translate one share
+uniformly and multiply every other field share by an independent uniform nonzero
+scalar.  Its analysis gives an exact identity for arbitrary finite-output
+stochastic channels, not merely an asymptotic upper bound.
+
+The translation removes cross-character terms in the squared likelihood ratio.
+The multipliers then average every nontrivial character over the same orbit.
+This exposes the governing invariant: the distribution of each local channel's
+nonconstant Fourier energy across dual-group orbits.
+
+\paragraph{Contributions.}
+Within the temporal experiment formalized in Section~\ref{sec:model}, we prove:
+\begin{enumerate}
+    \item an exact, fixed-secret $\chitwo$ identity over every finite field;
+    \item an exact dual-orbit identity for finite abelian groups and arbitrary
+          automorphism subgroups;
+    \item a matching minimax lower bound over $\F_{2^n}$ for local $\chitwo$
+          budgets in $[0,1]$, witnessed by binary one-character channels;
+    \item uniqueness and multiplier-seed entropy consequences for the uniform
+          relative-multiplier distribution; and
+    \item an impossibility observation showing that arbitrary leakage functions
+          can undo local bijections when the metadata is available during leakage.
+\end{enumerate}
+
+\paragraph{Scope.}
+Leakage followed by a reveal phase is established in stronger secret-sharing
+models~\cite{ckos21,hvw25}; those works reveal additional shares or support
+equivocation, rather than analyzing the hidden encoding metadata used here.
+After-the-fact leakage is also established terminology in other primitives.
+We do not claim that the chronology itself is new.  Our model is weaker than
+adaptive or joint leakage: channels cannot depend on the hidden recovery capsule,
+their outputs are conditionally independent, and no new leakage is taken after
+disclosure.  Section~\ref{sec:related} gives a conservative comparison.
+
+\section{Preliminaries}
+
+For distributions $P$ and $M$ on a finite set with $P\ll M$, define
+\[
+  \chitwo(P\Vert M)
+    = \sum_{\omega}M(\omega)
+      \left(\frac{P(\omega)}{M(\omega)}-1\right)^2
+\]
+and
+\[
+  \TV(P,M)=\frac12\sum_{\omega}|P(\omega)-M(\omega)|.
+\]
+The Cauchy--Schwarz inequality gives
+\begin{equation}\label{eq:tvchi}
+  \TV(P,M)\leq \frac12\sqrt{\chitwo(P\Vert M)}.
+\end{equation}
+
+Let $G$ be a finite abelian group, written additively.  Its dual $\widehat G$
+is the group of homomorphisms $\gamma:G\to\mathbb{C}^{*}$ whose images have
+unit modulus.  We use normalized expectation for Fourier coefficients.  Thus,
+for $f:G\to\mathbb{C}$,
+\[
+    \widehat f(\gamma)=\E_{x\leftarrow G}\gamma(x)f(x).
+\]
+Using a conjugate in this definition only relabels characters.  Orthogonality and
+Parseval take the forms
+\begin{align}
+ \E_x\gamma(x)\overline{\psi(x)}&=\mathbf 1[\gamma=\psi],\label{eq:orth}\
+ \E_x|f(x)|^2&=\sum_{\gamma\in\widehat G}|\widehat f(\gamma)|^2.
+ \label{eq:parseval}
+\end{align}
+
+\subsection{Local channel energy}
+
+Let $W:G\to\mathcal Z$ be a finite-output stochastic channel and let $X$ be
+uniform in $G$.  Put
+\[
+  q(z)=\E_X W(z\mid X),\qquad
+  g(x,z)=\frac{W(z\mid x)}{q(z)}-1
+\]
+for $z$ with $q(z)>0$.  Define
+\begin{equation}\label{eq:energy}
+ e(W)=\chitwo(P_{X,Z}\Vert P_XP_Z)
+     =\E_{x\leftarrow G,z\leftarrow q}|g(x,z)|^2.
+\end{equation}
+Since $\E_xg(x,z)=0$, Parseval implies
+\begin{equation}\label{eq:spectral-energy}
+ e(W)=\sum_{\gamma\neq 1}E_W(\gamma),\qquad
+ E_W(\gamma)=\E_{z\leftarrow q}
+     \left|\E_{x\leftarrow G}\gamma(x)g(x,z)\right|^2.
+\end{equation}
+
+\begin{lemma}[Output-alphabet bound]\label{lem:alphabet}
+For every finite-output channel $W:G\to\mathcal Z$,
+\[
+ e(W)\leq |\supp(Z)|-1.
+\]
+If $W$ is a deterministic function with exactly $r$ attained outputs, then
+$e(W)=r-1$.
+\end{lemma}
+
+\begin{proof}
+Form the normalized joint matrix
+\[
+ K_{x,z}=\frac{P_{X,Z}(x,z)}{\sqrt{P_X(x)P_Z(z)}}.
+\]
+It represents a conditional-expectation operator, so its singular values are at
+most one.  The constant functions give one singular value equal to one, while
+\[
+ \|K\|_{\mathrm F}^2
+   =\sum_{x,z}\frac{P_{X,Z}(x,z)^2}{P_X(x)P_Z(z)}
+   =1+e(W).
+\]
+Since $\operatorname{rank}K\leq |\supp(Z)|$, the other squared singular values
+sum to at most $|\supp(Z)|-1$.  For deterministic $W$ with $r$ nonempty
+fibers, the $r$ normalized columns are orthonormal, so all $r$ nonzero singular
+values equal one.
+\end{proof}
+
+\section{Delayed-disclosure experiment}\label{sec:model}
+
+Let $F=\F_Q$ and fix $d\geq2$.  To share $s\in F$, sample
+$U_1,\ldots,U_{d-1}$ independently and uniformly, and set
+\[
+ U_d=s-\sum_{i=1}^{d-1}U_i.
+\]
+Independently sample
+\[
+ B\leftarrow F,\qquad A_2,\ldots,A_d\leftarrow F^{*}
+\]
+uniformly, and define
+\begin{equation}\label{eq:encoding}
+ X_1=U_1+B,qquad X_i=A_iU_i\quad(2\leq i\leq d).
+\end{equation}
+The recovery capsule is $R=(B,A_2,\ldots,A_d)$, and correctness follows from
+\begin{equation}\label{eq:reconstruct}
+ s=(X_1-B)+\sum_{i=2}^{d}A_i^{-1}X_i.
+\end{equation}
+
+Before $R$ is sampled, an adversary fixes finite-output local channels
+$W_i:F\to\mathcal Z_i$.  A single snapshot samples the $Z_i$ independently
+conditional on the stored values, with $Z_i\sim W_i(\cdot\mid X_i)$.  The
+capsule $R$ is then disclosed.  The adversary may choose the channels after
+choosing two challenge secrets, but cannot make the channels depend on $R$ or
+take another snapshot after disclosure.
+
+For each $i$, let $q_i$ and $e_i=e(W_i)$ be defined as in
+Equations~\eqref{eq:energy}--\eqref{eq:spectral-energy} for a uniform field
+input.  Every $X_i$ is marginally uniform for every fixed secret.  Consequently,
+$q_i$ is also the fixed-secret marginal of $Z_i$.
+
+\section{Exact field identity}
+
+\begin{theorem}[Exact fixed-secret identity]\label{thm:field}
+For every $s\in F$,
+\begin{equation}\label{eq:field-main}
+ \chitwo\left(
+    P_{R,Z_1,\ldots,Z_d\mid S=s}
+    \middle\Vert
+    P_R\prod_{i=1}^{d}q_i
+ \right)
+ =\frac{\prod_{i=1}^{d}e_i}{(Q-1)^{d-1}}.
+\end{equation}
+In particular, the value is independent of $s$.
+\end{theorem}
+
+\begin{proof}
+For fixed $z_i$, write
+\[
+ g_i(x,z_i)=\frac{W_i(z_i\mid x)}{q_i(z_i)}-1,
+ \qquad
+ c_i(\gamma,z_i)=\E_{x\leftarrow F}\gamma(x)g_i(x,z_i).
+\]
+The trivial coefficient is zero.  Relative to $d$ independent uniform field
+elements, the density of additive shares of $s$ is
+\begin{equation}\label{eq:constraint}
+ Q\mathbf 1\left[\sum_i u_i=s\right]
+ =\sum_{\gamma\in\widehat F}\gamma\left(\sum_i u_i-s\right).
+\end{equation}
+
+Fix $r=(b,a_2,\ldots,a_d)$ and let
+\[
+ \Lambda_{s,r}(z)=
+ \frac{P[Z=z\mid S=s,R=r]}{\prod_i q_i(z_i)}.
+\]
+Substitute $u_1=x_1-b$ and $u_i=a_i^{-1}x_i$ in
+Equation~\eqref{eq:constraint}.  Expanding
+$\prod_i(1+g_i(x_i,z_i))$, every nontrivial-character term containing a
+constant local factor has zero expectation.  Hence
+\begin{equation}\label{eq:likelihood-expansion}
+ \Lambda_{s,r}(z)-1
+ =\sum_{\gamma\neq1}
+   \gamma(-s-b)c_1(\gamma,z_1)
+   \prod_{i=2}^{d}c_i(\gamma\circ m_{a_i^{-1}},z_i),
+\end{equation}
+where $m_a(x)=ax$.
+
+Square Equation~\eqref{eq:likelihood-expansion} and average with respect to
+$P_R\prod_iq_i$.  By orthogonality,
+\[
+ \E_B\gamma(-B)\overline{\psi(-B)}=\mathbf1[\gamma=\psi].
+\]
+All cross-character terms therefore vanish.  The secret-dependent phase has
+modulus one.  For every fixed nontrivial $\gamma$, uniform $A_i\in F^{*}$
+makes $\gamma\circ m_{A_i^{-1}}$ uniform among all $Q-1$ nontrivial additive
+characters.  Thus
+\[
+ \E_{A_i,Z_i}
+   |c_i(\gamma\circ m_{A_i^{-1}},Z_i)|^2
+ =\frac{e_i}{Q-1}.
+\]
+The local outputs and multipliers are independent, so the remaining diagonal
+sum is
+\[
+ \sum_{\gamma\neq1}
+   \E_{Z_1}|c_1(\gamma,Z_1)|^2
+   \prod_{i=2}^{d}\frac{e_i}{Q-1}
+ =\frac{\prod_i e_i}{(Q-1)^{d-1}},
+\]
+using Equation~\eqref{eq:spectral-energy} for the first coordinate.
+\end{proof}
+
+\begin{corollary}[Pairwise statistical secrecy]\label{cor:tv}
+For all $s,t\in F$,
+\[
+ \TV(P_{R,Z\mid S=s},P_{R,Z\mid S=t})
+ \leq
+ \sqrt{\frac{\prod_i e_i}{(Q-1)^{d-1}}}.
+\]
+If each leakage output has at most $2^{\ell_i}$ values, then the right-hand side
+is at most
+\[
+ \sqrt{\frac{\prod_i(2^{\ell_i}-1)}{(Q-1)^{d-1}}}.
+\]
+\end{corollary}
+
+\begin{proof}
+Use Equation~\eqref{eq:tvchi}, the triangle inequality through the common
+reference $P_R\prod_iq_i$, Theorem~\ref{thm:field}, and
+Lemma~\ref{lem:alphabet}.
+\end{proof}
+
+\section{Finite abelian groups and dual orbits}
+
+Let $G$ be a finite abelian group and $H\leq\Aut(G)$.  Additively share
+$s\in G$, translate the first share by uniform $B\in G$, and apply independent
+uniform $h_i\in H$ to shares $2,\ldots,d$.  Reconstruction applies the inverse
+automorphisms after subtracting $B$.
+
+The group $H$ acts on $\widehat G$ by
+\[
+ h\cdot\gamma=\gamma\circ h^{-1}.
+\]
+For a nontrivial orbit $\mathcal O\subseteq\widehat G$, define
+\[
+ e_i(\mathcal O)=\sum_{\gamma\in\mathcal O}E_{W_i}(\gamma).
+\]
+
+\begin{theorem}[Exact orbit identity]\label{thm:orbit}
+In the preceding experiment, for every fixed $s\in G$,
+\begin{equation}\label{eq:orbit}
+ \chitwo\left(P_{R,Z\mid S=s}\middle\Vert P_R\prod_iq_i\right)
+ =\sum_{\substack{\mathcal O\text{ an }H\text{-orbit}\\
+                   \mathcal O\neq\{1\}}}
+   \frac{\prod_{i=1}^{d}e_i(\mathcal O)}
+        {|\mathcal O|^{d-1}}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The translation average removes cross-character terms exactly as in
+Theorem~\ref{thm:field}.  By orbit--stabilizer, a uniform $h\in H$ maps any
+fixed $\gamma$ uniformly over its orbit.  Thus, for $i\geq2$, the averaged local
+energy at $\gamma$ is $e_i(\mathcal O_\gamma)/|\mathcal O_\gamma|$.
+Summing the first local energy over $\gamma$ and grouping by orbit gives
+Equation~\eqref{eq:orbit}.
+\end{proof}
+
+\begin{remark}
+Field multiplication is transitive on the nontrivial additive characters of
+$\F_Q$.  Theorem~\ref{thm:field} is therefore the single-nontrivial-orbit case
+of Theorem~\ref{thm:orbit}.
+\end{remark}
+
+\section{Minimax multiplier randomization}
+
+We next allow the relative multiplier tuple
+$A=(A_2,\ldots,A_d)$ to have an arbitrary distribution $D$ on
+$(F^{*})^{d-1}$, while $B$ remains uniform and independent.  For prescribed
+budgets $\varepsilon_i$, let
+\[
+ \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
+ =\sup_{W_i:e(W_i)\leq\varepsilon_i}
+   \chitwo(P_{R,Z\mid S=s}\Vert P_R\prod_iq_i).
+\]
+The value may depend on the fixed $s$ a priori, although the witnesses below do
+not.
+
+\begin{theorem}[Minimax identity]\label{thm:minimax}
+Let $F=\F_{2^n}$, $Q=2^n$, and $0\leq\varepsilon_i\leq1$.  Then
+\begin{equation}\label{eq:minimax}
+ \inf_D\mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
+ =\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\end{equation}
+Uniform $D$ attains the infimum.  If every $\varepsilon_i>0$, it is the unique
+attaining distribution on the relative multiplier tuple.
+\end{theorem}
+
+\begin{proof}
+For uniform $D$, Theorem~\ref{thm:field} gives
+\[
+ \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
+ \leq\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\]
+
+For the converse, write the nontrivial additive characters as
+\[
+ \chi_\beta(x)=(-1)^{\operatorname{Tr}(\beta x)},\qquad \beta\in F^{*},
+\]
+where $\operatorname{Tr}:F\to\F_2$ is the absolute trace.  For
+$z\in\{-1,+1\}$ define
+\begin{equation}\label{eq:witness-channel}
+ W_{i,\beta_i}(z\mid x)
+ =\frac12\left(1+z\sqrt{\varepsilon_i}\chi_{\beta_i}(x)\right).
+\end{equation}
+This is a valid channel because $\varepsilon_i\leq1$.  Its output is uniform,
+and its centered response has energy $\varepsilon_i$ at the single character
+$\chi_{\beta_i}$.
+
+Fix any tuple $a=(a_2,\ldots,a_d)\in(F^{*})^{d-1}$.  Choose
+$\beta_1\neq0$ arbitrarily and set $\beta_i=\beta_1a_i^{-1}$.  In the Fourier
+expansion, the channels in Equation~\eqref{eq:witness-channel} align if and only
+if the relative multiplier tuple equals $a$.  The translation average removes
+all cross terms, so the resulting divergence is
+\[
+  \left(\prod_i\varepsilon_i\right)D(a).
+\]
+Selecting a largest atom gives
+\[
+ \mathcal R(D;\varepsilon_1,\ldots,\varepsilon_d)
+ \geq\left(\prod_i\varepsilon_i\right)\max_aD(a)
+ \geq\frac{\prod_i\varepsilon_i}{(Q-1)^{d-1}}.
+\]
+If the product is positive, equality requires all $(Q-1)^{d-1}$ atoms of $D$
+to be equal.
+\end{proof}
+
+\begin{corollary}[Multiplier-seed entropy]\label{cor:entropy}
+Within the multiplier compiler of Theorem~\ref{thm:minimax}, attaining the exact
+minimax value for positive budgets requires the relative multiplier tuple to be
+uniform.  Any random seed from which that tuple is deterministically generated
+therefore has min-entropy at least
+\[
+  (d-1)\log_2(Q-1).
+\]
+\end{corollary}
+
+This corollary does not lower-bound the randomness needed for the translation
+$B$, nor does it apply to arbitrary nonlocal encodings.
+
+\section{Why disclosure order is essential}
+
+\begin{proposition}[Cancellation of metadata-aware bijections]
+Suppose a local randomized encoding has the form $x=\pi_\rho(u)$, where
+$\pi_\rho$ is a bijection and the metadata $\rho$ is available to a leakage
+function.  For every leakage function $f$ on the original share, there is a
+metadata-aware function
+\[
+  \ell(\rho,x)=f(\pi_\rho^{-1}(x))
+\]
+with exactly the same output.  Consequently, arbitrary metadata-aware local
+leakage obtains no information-theoretic protection from such bijections.
+\end{proposition}
+
+For the field construction, the attack can be made explicit.  If the metadata is
+available during leakage, let
+\[
+ \ell_1(B,X_1)=\operatorname{Tr}(X_1-B),\qquad
+ \ell_i(A_i,X_i)=\operatorname{Tr}(A_i^{-1}X_i).
+\]
+The xor of the leaked bits is $\operatorname{Tr}(s)$.  Thus public multipliers
+do not repair the standard small-characteristic attack.
+
+\section{Related work and novelty boundary}\label{sec:related}
+
+Benhamouda, Degwekar, Ishai, and Rabin initiated the direct Fourier-analytic
+study of local leakage for additive and Shamir secret sharing~\cite{bdir18}.
+Subsequent work constructed locally leakage-resilient linear schemes and obtained
+tight or broader estimates for additive and linear sharing
+~\cite{mpsw21,maji22tight,maji22bounded}.  These works establish the basic
+dual-code product mechanism on which our calculation depends.
+
+Faust, Masure, Micheli, Orlt, and Standaert connect the same Fourier framework to
+physical prime-field masking, including exact expressions for average and
+worst-case statistical metrics~\cite{faust24practice}.  Their results make clear
+that the hidden translation in our construction, viewed alone, is not a
+substantial mathematical advance: it changes which average is represented in
+the transcript.  The candidate contribution here is the channel-independent
+$\chitwo$ factorization after automorphism averaging, its orbit decomposition,
+and the matching minimax attack.
+
+Adaptive leakage-and-reveal secret sharing allows leakage on selected shares
+followed by full revelation of different shares~\cite{ckos21}.  A later
+manuscript challenges the published construction's security proof~\cite{hzw22};
+we use the former for model comparison, not as a correctness assumption.
+Equivocal secret sharing gives stronger simulation behavior under adaptive
+probing and explicitly motivates leakage protection for data at rest
+~\cite{hvw25}.  Neither inspected source states the recovery-capsule experiment
+or exact orbit/minimax identity here.
+
+Principal inertia components give a general spectral description of dependence
+through conditional-expectation operators~\cite{calmon17}.  This subsumes the
+linear-algebraic interpretation of Lemma~\ref{lem:alphabet}.  Channel comparison
+under symmetry and $\chitwo$ divergence is also established in information
+theory~\cite{makur16}.  A complete novelty review must therefore cover both
+cryptographic leakage and classical channel-symmetrization literature.
+
+\section{Limitations and open directions}
+
+The present result has several sharp limitations.
+\begin{itemize}
+    \item It is one-shot.  Leakage after capsule disclosure can invert the local
+          transformations.
+    \item It assumes conditionally independent local channels.  Joint leakage and
+          adaptively selected channels are outside the exact identity.
+    \item The capsule must occupy a different leakage domain during the snapshot.
+    \item The minimax lower bound covers local $\chitwo$ budgets at most one.
+          Larger budgets require different extremal channels.
+    \item Minimax optimality holds within the relative-multiplier compiler class,
+          not among all leakage-resilient encodings.
+    \item The result has not yet been placed in a composable security framework or
+          validated against a concrete physical leakage experiment.
+\end{itemize}
+
+Natural mathematical questions include characterizing the minimax value for
+multiple dual orbits, extending the extremal-channel result beyond characteristic
+two and beyond unit budgets, and determining whether correlated randomizers can
+reduce total seed entropy without weakening the worst-case guarantee.  The main
+cryptographic question is whether the recovery-capsule chronology yields a useful
+primitive under a recognized snapshot-leakage model.
+
+\section{Conclusion}
+
+Hidden local automorphisms can turn spectral alignment into an exactly
+quantifiable resource when leakage occurs once and the recovery metadata is
+disclosed afterward.  Translation orthogonality removes cross-character terms,
+while automorphism averaging exposes the dual-orbit energy profile.  In the
+single-orbit field case this yields a product identity, and over characteristic
+two concentrated-character attacks show that uniform relative multipliers are
+minimax within the stated class.  The same bijections provide no protection when
+their metadata is available to the leakage functions, so any application must
+treat timing and isolation as part of the security boundary.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
