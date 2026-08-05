@@ -29,6 +29,7 @@ certified novel.
 - `docs/proof-audit.md`: independent derivation checks and edge cases.
 - `docs/novelty-audit.md`: closest-known-result matrix and search ledger.
 - `docs/research-plan.md`: concrete gates between the current draft and submission.
+- `docs/HANDOFF.md`: current state, exact next step, and session-close blockers.
 
 ## Core claim, informally
 
@@ -58,7 +59,7 @@ can invert it before applying any attack on the original share.
 
 ## Verification state
 
-The active resource-constrained window prohibits compiling the LaTeX manuscript or executing
-verification code. Only source inspection, proof checking, repository checks, commits, and the
-requested Git push are permitted. Exact future verification commands are recorded in
-`docs/research-plan.md`.
+This draft was produced during a resource-constrained window. The LaTeX manuscript was not
+compiled and verification code was not executed. Source inspection, proof checking, static
+repository checks, commits, and pushes were completed. Exact future verification commands are
+recorded in `docs/research-plan.md`, and the resumable closeout state is in `docs/HANDOFF.md`.
